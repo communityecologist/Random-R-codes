@@ -6,7 +6,7 @@
 #####################################################
 
 # This code is used in:
-# Tatsumi S, Iritani R, Cadotte MW (2021) Partitioning the temporal changes in abundance-based beta diversity into loss and gain components. Methods in Ecology and Evolution
+# Tatsumi S, Iritani R, Cadotte MW (2022) Partitioning the temporal changes in abundance-based beta diversity into loss and gain components. Methods in Ecology and Evolution
 
 SiteInfo    <- read.csv("1873_2_RivFishTIME_TimeseriesTable.csv")
 Dat         <- read.csv("1873_2_RivFishTIME_SurveyTable.csv")
@@ -62,19 +62,17 @@ for(i in 1:nrow(Mat6)){
   }
 }
 
-# 01 Harrison-Baselga
 Dpa1 <- D1
 Dpa1[Dpa1>0] <- 1
 Dpa2 <- D2
 Dpa2[Dpa2>0] <- 1
 
-aaa <-  sapply(1:length(unique(RPW)), function(w) hb(Dpa1[RPW==unique(RPW)[w],]))
-bbb <-  sapply(1:length(unique(RPW)), function(w) hb(Dpa2[RPW==unique(RPW)[w],]))
-XXX <-  bbb-aaa
-HBs <- sapply(1:length(unique(RPW)), function(w) ecopart.multi.abund(Dpa1[RPW==unique(RPW)[w],], Dpa2[RPW==unique(RPW)[w],]))
+# Presence-absence-based normalized Whittaker's beta (Harrison's beta) (Fig. 3a)
+Harrison <- sapply(1:length(unique(RPW)), function(w) ecopart.multi(Dpa1[RPW==unique(RPW)[w],], Dpa2[RPW==unique(RPW)[w],], index="baselga", components="two"))
+Harrison <- rbind(Total=colSums(Harrison), Harrison)
+boxplot(t(Harrison))
 
-# Abundance Harrison-Baselga
-aaa <-  sapply(1:length(unique(RPW)), function(w) hb(D1[RPW==unique(RPW)[w],]))
-bbb <-  sapply(1:length(unique(RPW)), function(w) hb(D2[RPW==unique(RPW)[w],]))
-XXX <-  bbb-aaa
-HBs <- sapply(1:length(unique(RPW)), function(w) ecopart.multi.abund(D1[RPW==unique(RPW)[w],], D2[RPW==unique(RPW)[w],]))
+# Abundance-based normalized Whittaker's beta (Baselga's beta) (Fig. 3b)
+Baselga  <- sapply(1:length(unique(RPW)), function(w) ecopart.multi(D1[RPW==unique(RPW)[w],], D2[RPW==unique(RPW)[w],], index="baselga", components="two"))
+Baselga  <- rbind(Total=colSums(Baselga), Baselga)
+boxplot(t(Baselga))
